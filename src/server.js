@@ -1,6 +1,6 @@
 import http from 'http'
-import app from './src/index.js'
-import connectToDb from './src/db/connectToDb.js';
+import app from './index.js'
+import connectToDb from './db/connectToDb.js';
 
 
 const server = http.createServer(app);
