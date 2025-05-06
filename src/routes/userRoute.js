@@ -6,7 +6,7 @@ import { authMiddleware, authorizeAdmin } from '../middleware/authMiddleware.js'
 
 const route = express.Router()
 
-route.get('/',authMiddleware,getUser)
+route.get('/',authMiddleware,authorizeAdmin,getUser)
 route.post('/',authMiddleware,authorizeAdmin,postUser)
 route.get('/:id',authMiddleware,getUserId)
 route.patch("/:id",authMiddleware,patchUser)
