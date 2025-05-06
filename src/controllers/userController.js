@@ -1,7 +1,7 @@
 import Users from "../models/userSchema.js";
 import { responseStatus } from "../service/responseStatus.js";
 import generateToken from "../utils/generateToken.js";
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export const getUser = async (req, res) => {
   try {
