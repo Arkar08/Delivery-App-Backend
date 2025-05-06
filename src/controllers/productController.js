@@ -18,14 +18,24 @@ export const getProduct = async (req, res) => {
 
       const products = { ...product.toObject() };
       delete products.__v;
-      delete products.createdAt;
-      delete products.updatedAt;
 
       return {
         ...products,
         category: categoryName,
       };
     });
+
+    const compare = (a,b)=>{
+      if ( a.createdAt < b.createdAt){
+        return 1;
+      }
+      if ( a.createdAt > b.createdAt ){
+        return -1;
+      }
+      return 0;
+    }
+
+    getProducts.sort(compare)
 
     const data = {
       res: res,

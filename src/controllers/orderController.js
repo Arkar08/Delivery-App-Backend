@@ -10,8 +10,8 @@ export const getOrder = async (req, res) => {
     const findCustomer = await Users.find({ _id: mapCustomer });
 
     let customerMap = {};
-    findCustomer.map((customer) => {
-      return (customerMap[customer._id] = customerMap.name);
+    findCustomer.forEach((customer) => {
+      customerMap[customer._id] = customer.name;
     });
 
     const getOrderList = findOrder.map((order) => {
@@ -29,6 +29,20 @@ export const getOrder = async (req, res) => {
         deliveryMen: deliveryMan,
       };
     });
+
+    
+    const compare = (a,b)=>{
+      if ( a.orderNo < b.orderNo){
+        return 1;
+      }
+      if ( a.orderNo > b.orderNo ){
+        return -1;
+      }
+      return 0;
+    }
+
+    getOrderList.sort(compare)
+
 
     const data = {
       res: res,
@@ -247,3 +261,143 @@ export const deleteOrder = async (req, res) => {
     console.log(error);
   }
 };
+
+
+export const getOrderCustomer = async(req,res)=>{
+  try {
+    const {userId} = req.params;
+    const findOrder = await Orders.find({customer:userId})
+    
+
+    if(findOrder.length === 0){
+        const data = {
+          res:res,
+          status:400,
+          success:false,
+          message:"UserId does not exist."
+        }
+
+        return responseStatus(data)
+    }else{
+      const mapCustomer = findOrder.map((order) => order.customer);
+      const findCustomer = await Users.find({ _id: mapCustomer });
+  
+      let customerMap = {};
+      findCustomer.forEach((customer) => {
+        customerMap[customer._id] = customer.name;
+      });
+  
+      const getOrderList = findOrder.map((order) => {
+        const customerName = customerMap[order.customer] || "Unknown";
+        const deliveryMan = customerMap[order.deliveryMen] || "Unknown";
+  
+  
+        const orderList = { ...order.toObject() };
+        delete orderList.__v;
+        delete orderList.createdAt;
+        delete orderList.updatedAt;
+  
+        return {
+          ...orderList,
+          customer: customerName,
+          deliveryMen: deliveryMan,
+        };
+      });
+  
+      const compare = (a,b)=>{
+        if ( a.orderNo < b.orderNo){
+          return 1;
+        }
+        if ( a.orderNo > b.orderNo ){
+          return -1;
+        }
+        return 0;
+      }
+  
+      getOrderList.sort(compare)
+  
+     
+  
+      const data = {
+        res: res,
+        data: getOrderList,
+        status: 200,
+        success: true,
+      };
+      return responseStatus(data);
+      
+    }
+
+   
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getOrderDelivery = async(req,res)=>{
+  try {
+    const {userId} = req.params;
+    const findOrder = await Orders.find({deliveryMen:userId})
+    if(findOrder.length === 0){
+      const data = {
+        res:res,
+        status:400,
+        success:false,
+        message:"UserId does not exist."
+      }
+
+      return responseStatus(data)
+  }else{
+    const mapCustomer = findOrder.map((order) => order.customer);
+    const findCustomer = await Users.find({ _id: mapCustomer });
+
+    let customerMap = {};
+    findCustomer.forEach((customer) => {
+      customerMap[customer._id] = customer.name;
+    });
+
+    const getOrderList = findOrder.map((order) => {
+      const customerName = customerMap[order.customer] || "Unknown";
+      const deliveryMan = customerMap[order.deliveryMen] || "Unknown";
+
+
+      const orderList = { ...order.toObject() };
+      delete orderList.__v;
+      delete orderList.createdAt;
+      delete orderList.updatedAt;
+
+      return {
+        ...orderList,
+        customer: customerName,
+        deliveryMen: deliveryMan,
+      };
+    });
+
+    const compare = (a,b)=>{
+      if ( a.orderNo < b.orderNo){
+        return 1;
+      }
+      if ( a.orderNo > b.orderNo ){
+        return -1;
+      }
+      return 0;
+    }
+
+    getOrderList.sort(compare)
+
+   
+
+    const data = {
+      res: res,
+      data: getOrderList,
+      status: 200,
+      success: true,
+    };
+    return responseStatus(data);
+    
+  }
+    
+  } catch (error) {
+    console.log(error)
+  }
+}

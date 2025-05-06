@@ -11,6 +11,18 @@ export const getCategory = async (req, res) => {
       return list;
     });
 
+    const compare = (a,b)=>{
+      if ( a.createdAt < b.createdAt){
+        return 1;
+      }
+      if ( a.createdAt > b.createdAt ){
+        return -1;
+      }
+      return 0;
+    }
+
+    category.sort(compare)
+
     const data = {
       res: res,
       data: category,
