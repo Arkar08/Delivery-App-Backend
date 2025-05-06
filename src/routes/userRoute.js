@@ -1,15 +1,16 @@
 import express from 'express'
 import { deleteUser, getUser, getUserId, loginUser, logout, patchUser, postUser, signUpUser } from '../controllers/userController.js'
+import { authMiddleware } from '../middleware/authMiddleware.js'
 
 
 
 const route = express.Router()
 
-route.get('/',getUser)
-route.post('/',postUser)
-route.get('/:id',getUserId)
-route.patch("/:id",patchUser)
-route.delete("/:id",deleteUser)
+route.get('/',authMiddleware,getUser)
+route.post('/',authMiddleware,postUser)
+route.get('/:id',authMiddleware,getUserId)
+route.patch("/:id",authMiddleware,patchUser)
+route.delete("/:id",authMiddleware,deleteUser)
 route.post("/signup",signUpUser)
 route.post("/login",loginUser)
 route.post("/logout",logout)

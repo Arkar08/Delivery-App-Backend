@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema({
     },
     role:{
         type:String,
-        enums:['Admin','DeliveryMan','Customer'],
+        enums:['Admin','Delivery','Customer'],
         require:true
     },
     createdDate:{

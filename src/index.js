@@ -23,7 +23,7 @@ app.get('/',(req,res)=>{
 
 // routes
 
-app.use('/api/v1/user',authMiddleware,userRoute)
+app.use('/api/v1/user',userRoute)
 app.use('/api/v1/category',authMiddleware,categoryRoute)
 app.use('/api/v1/order',authMiddleware,orderRoute)
 app.use('/api/v1/products',authMiddleware,productRoute)
