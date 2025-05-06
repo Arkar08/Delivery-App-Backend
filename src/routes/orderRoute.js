@@ -8,7 +8,7 @@ const route = express.Router()
 route.get('/',authorizeAdmin,getOrder)
 route.post('/',authorizeCustomer,postOrder)
 route.get("/:id",getOrderId)
-route.patch("/:id",authorizeDelivery,authorizeCustomer,patchOrder)
+route.patch("/:id",patchOrder)
 route.delete("/:id",authorizeAdmin,deleteOrder)
 
 route.get("/find/:userId",authorizeCustomer,getOrderCustomer)
