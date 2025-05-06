@@ -1,5 +1,7 @@
 import Users from "../models/userSchema.js";
 import { responseStatus } from "../service/responseStatus.js";
+import generateToken from "../utils/generateToken.js";
+import bcrypt from 'bcrypt'
 
 export const getUser = async (req, res) => {
   try {
@@ -10,6 +12,7 @@ export const getUser = async (req, res) => {
       delete list.__v;
       delete list.createdAt;
       delete list.updatedAt;
+      delete list.password;
       return list;
     });
 
@@ -28,7 +31,7 @@ export const getUser = async (req, res) => {
 
 export const postUser = async (req, res) => {
   try {
-    const { name, email, password, phone, role } = req.body;
+    const { name, email, password, phone, role,address,longitude,latitude } = req.body;
     if (!name || !email || !password || !phone || !role) {
       const data = {
         res: res,
@@ -39,27 +42,31 @@ export const postUser = async (req, res) => {
       return responseStatus(data);
     }
 
-    const newAddress = "Yangon";
-    const newLongitude = "16.871311";
-    const newLatitude = "96.199379";
-
     const findEmail = await Users.findOne({ email: email });
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
     if (!findEmail) {
       const newUser = await Users.create({
         name: name,
         email: email,
-        password: password,
+        password: hashPassword,
         phone: phone,
         role: role,
-        address: newAddress,
-        longitude: newLongitude,
-        latitude: newLatitude,
+        address: address,
+        longitude: longitude,
+        latitude: latitude,
       });
 
-      const newUserList = { ...newUser.toObject() };
+      const token = await generateToken(res,newUser._id)
+
+      const newUserList = { ...newUser.toObject(),token:token };
       delete newUserList.__v;
       delete newUserList.createdAt;
       delete newUserList.updatedAt;
+      delete newUserList.password;
+
+      
 
       const data = {
         res: res,
@@ -102,6 +109,7 @@ export const getUserId = async (req, res) => {
     delete newUserList.__v;
     delete newUserList.createdAt;
     delete newUserList.updatedAt;
+    delete newUserList.password;
 
     if (!findUserId) {
       const data = {
@@ -161,6 +169,7 @@ export const patchUser = async (req, res) => {
           delete newUserList.__v;
           delete newUserList.createdAt;
           delete newUserList.updatedAt;
+          delete newUserList.password;
 
           const data = {
             res: res,
@@ -232,3 +241,123 @@ export const deleteUser = async (req, res) => {
     console.log(error);
   }
 };
+
+
+export const signUpUser = async(req,res)=>{
+  try {
+    const { name, email, password, phone, role,address,latitude,longitude } = req.body;
+    if (!name || !email || !password || !phone || !role) {
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Plz filled out in the form field.",
+      };
+      return responseStatus(data);
+    }
+    const findEmail = await Users.findOne({ email: email });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+    if (!findEmail) {
+      const newUser = await Users.create({
+        name: name,
+        email: email,
+        password: hashPassword,
+        phone: phone,
+        role: role,
+        address: address,
+        longitude: longitude,
+        latitude: latitude,
+      });
+
+      const token = await generateToken(res,newUser._id)
+
+      const newUserList = { ...newUser.toObject(),token:token };
+      delete newUserList.__v;
+      delete newUserList.createdAt;
+      delete newUserList.updatedAt;
+
+      
+
+      const data = {
+        res: res,
+        status: 201,
+        data: [newUserList],
+        success: true,
+      };
+
+      return responseStatus(data);
+    } else {
+      const data = {
+        res: res,
+        success: false,
+        status: 400,
+        message: "Email is already exist.",
+      };
+      return responseStatus(data);
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const loginUser = async(req,res)=>{
+  try {
+    const {email,password} = req.body;
+    const validatorEmail = await Users.findOne({email:email})
+    if(!validatorEmail){
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Email does not exist.",
+      };
+      return responseStatus(data);
+  }
+    if(validatorEmail){
+      const validatorPassword = await bcrypt.compare(password,validatorEmail.password)
+      if(!validatorPassword){
+        const data = {
+          res: res,
+          success: false,
+          status: 404,
+          message: "Passoword is wrong.",
+        };
+        return responseStatus(data);
+      }
+      if(validatorPassword){
+        const token = await generateToken(res,validatorEmail._id)
+        const dataList = {
+          email:validatorEmail.email,
+          token,
+          role:validatorEmail.role
+        }
+
+        const data = {
+          res: res,
+          success: true,
+          status: 200,
+          data: dataList
+        };
+        return responseStatus(data);
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const logout = async(req,res)=>{
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      maxAge: new Date(0),
+    });
+    const data = {
+      res: res,
+      success: true,
+      status: 200,
+      message: "logout successfully"
+    };
+    return responseStatus(data);
+}
