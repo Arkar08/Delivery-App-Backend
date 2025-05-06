@@ -1,101 +1,210 @@
 import Category from "../models/categorySchema.js";
+import { responseStatus } from "../service/responseStatus.js";
 
-export const getCategory = async(req,res)=>{
-    try {
-        const findData = await Category.find({})
-        return res.status(200).json(findData)
-    } catch (error) {
-        console.log(error)
+export const getCategory = async (req, res) => {
+  try {
+    const findData = await Category.find({});
+
+    const category = findData.map((data) => {
+      const list = { ...data.toObject() };
+      delete list.__v;
+      return list;
+    });
+
+    const data = {
+      res: res,
+      data: category,
+      status: 200,
+      success: true,
+    };
+    return responseStatus(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const postCategory = async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || name === "") {
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Plz filled out in the form field.",
+      };
+      return responseStatus(data);
     }
-}
+    const findCategory = await Category.findOne({ name: name });
+    if (!findCategory) {
+      const newCategory = await Category.create({
+        name: name,
+      });
 
+      const newCategoryList = { ...newCategory.toObject() };
+      delete newCategoryList.__v;
 
-export const postCategory = async(req,res)=>{
-    try {
-        const {name} = req.body;
-        if(!name){
-            return res.status(404).json("Plz filled out in the form field.")
-        }
-        const findCategory = await Category.findOne({name:name})
-        if(!findCategory){
-            const newCategory = await Category.create({
-                name:name
-            })
-            return res.status(201).json(newCategory)
-        }else{
-            return res.status(400).json("Category is already exist.")
-        }
-    } catch (error) {
-        console.log(error)
+      const data = {
+        res: res,
+        status: 201,
+        data: [newCategoryList],
+        success: true,
+      };
+
+      return responseStatus(data);
+    } else {
+      const data = {
+        res: res,
+        success: false,
+        status: 400,
+        message: "Category is already exist.",
+      };
+
+      return responseStatus(data);
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-
-export const getCategoryId = async(req,res)=>{
-    try {
-        const {id} = req.params;
-        if(!parseInt(id)){
-            return res.status(404).json('CategoryId does not exist.')
-        }
-
-        const findCategoryId = await Category.findOne({_id:id})
-        if(!findCategoryId){
-            return res.status(404).json('Not Found')
-        }
-        return res.status(200).json(findCategoryId)
-    } catch (error) {
-        console.log(error)
+export const getCategoryId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!parseInt(id)) {
+      const data = {
+        res: res,
+        success: false,
+        status: 400,
+        message: "CategoryId does not exist.",
+      };
+      return responseStatus(data);
     }
-}
 
-export const patchCategory = async(req,res)=>{
-    try {
-        const {id} = req.params;
-        if(!parseInt(id)){
-            return res.status(404).json('CategoryId does not exist.')
-        }
-        const findCategoryId = await Category.findOne({_id:id})
-        if(!findCategoryId){
-            return res.status(404).json('Not Found')
-        }else{
+    const findCategoryId = await Category.findOne({ _id: id });
 
-            const findCategoryName = await Category.findOne({name:req.body.name})
-            if(!findCategoryName){
-                const updateCategory = await Category.findOneAndUpdate({_id:id},{...req.body})
-            
-                if(updateCategory){
-                    const findCategory = await Category.findOne({_id:id})
-                    return res.status(200).json(findCategory)
-                }
-            }else{
-                return res.status(400).json("Category Name is already exist that cannot update this Category Name.")
-            }
-          
-        }
-
-    } catch (error) {
-        console.log(error)
+    if (!findCategoryId) {
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Not Found.",
+      };
+      return responseStatus(data);
     }
-}
 
-export const deleteCategory = async(req,res)=>{
-    try {
-        const {id} = req.params;
-        if(!parseInt(id)){
-            return res.status(404).json('CategoryId does not exist.')
-        }
-        const findCategoryId = await Category.findOne({_id:id})
-        if(!findCategoryId){
-            return res.status(404).json('Not Found')
-        }else{
-            const deleteCategory = await Category.findOneAndDelete({_id:id})
-            if(deleteCategory){
-                return res.status(200).json("Delete Successfully.")
-            }else{
-                return res.status(400).json("categoryName cannot delete.")
-            }
-        }
-    } catch (error) {
-        console.log(error)
+    const newCategoryList = { ...findCategoryId.toObject() };
+    delete newCategoryList.__v;
+
+    const data = {
+      res: res,
+      status: 200,
+      data: [newCategoryList],
+      success: true,
+    };
+
+    return responseStatus(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const patchCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!parseInt(id)) {
+      const data = {
+        res: res,
+        success: false,
+        status: 400,
+        message: "CategoryId does not exist.",
+      };
+      return responseStatus(data);
     }
-}
+    const findCategoryId = await Category.findOne({ _id: id });
+    if (!findCategoryId) {
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Not Found.",
+      };
+      return responseStatus(data);
+    } else {
+      const findCategoryName = await Category.findOne({ name: req.body.name });
+      if (!findCategoryName) {
+        const updateCategory = await Category.findOneAndUpdate(
+          { _id: id },
+          { ...req.body }
+        );
+
+        if (updateCategory) {
+          const findCategory = await Category.findOne({ _id: id });
+
+          const newCategoryList = { ...findCategory.toObject() };
+          delete newCategoryList.__v;
+          const data = {
+            res: res,
+            data: [newCategoryList],
+            status: 200,
+            success: true,
+          };
+          return responseStatus(data);
+        }
+      } else {
+        return res
+          .status(400)
+          .json(
+            "Category Name is already exist that cannot update this Category Name."
+          );
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!parseInt(id)) {
+      const data = {
+        res: res,
+        success: false,
+        status: 400,
+        message: "CategoryId does not exist.",
+      };
+      return responseStatus(data);
+    }
+    const findCategoryId = await Category.findOne({ _id: id });
+    if (!findCategoryId) {
+      const data = {
+        res: res,
+        success: false,
+        status: 404,
+        message: "Not Found.",
+      };
+      return responseStatus(data);
+    } else {
+      const deleteCategory = await Category.findOneAndDelete({ _id: id });
+      if (deleteCategory) {
+        const data = {
+          res: res,
+          success: true,
+          status: 200,
+          message: "Delete Successfully.",
+        };
+        return responseStatus(data);
+      } else {
+        const data = {
+          res: res,
+          success: false,
+          status: 400,
+          message: "CategoryName cannot delete.",
+        };
+        return responseStatus(data);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
