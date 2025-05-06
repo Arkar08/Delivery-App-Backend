@@ -21,3 +21,27 @@ export const authMiddleware = async(req, res, next) => {
     }
   };
   
+
+  export const authorizeDelivery = (req, res, next) => {
+    if (req.user && req.user.role === 'Delivery') {
+      next();
+    } else {
+      return res.status(401).json("not authorized as an Delivery");
+    }
+  };
+  
+  export const authorizeCustomer = (req, res, next) => {
+    if (req.user && req.user.role === 'Customer') {
+      next();
+    } else {
+      return res.status(401).json("not authorized as an Customer");
+    }
+  };
+
+  export const authorizeAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'Admin') {
+      next();
+    } else {
+      return res.status(401).json("not authorized as an Admin");
+    }
+  };
