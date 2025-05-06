@@ -7,6 +7,7 @@ import orderRoute from './routes/orderRoute.js'
 import productRoute from './routes/productRoute.js'
 import ratingRoute from './routes/ratingRoute.js'
 import { errorMiddleware } from './middleware/errorMiddleware.js'
+import { authMiddleware } from './middleware/authMiddleware.js'
 
 dotenv.config();
 
@@ -22,10 +23,10 @@ app.get('/',(req,res)=>{
 
 // routes
 
-app.use('/api/v1/user',userRoute)
-app.use('/api/v1/category',categoryRoute)
-app.use('/api/v1/order',orderRoute)
-app.use('/api/v1/products',productRoute)
-app.use('/api/v1/rating',ratingRoute)
+app.use('/api/v1/user',authMiddleware,userRoute)
+app.use('/api/v1/category',authMiddleware,categoryRoute)
+app.use('/api/v1/order',authMiddleware,orderRoute)
+app.use('/api/v1/products',authMiddleware,productRoute)
+app.use('/api/v1/rating',authMiddleware,ratingRoute)
 
 export default app;
