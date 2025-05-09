@@ -8,19 +8,21 @@ import productRoute from './routes/productRoute.js'
 import ratingRoute from './routes/ratingRoute.js'
 import { errorMiddleware } from './middleware/errorMiddleware.js'
 import { authMiddleware } from './middleware/authMiddleware.js'
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 app.use(errorMiddleware)
 
 app.get('/',(req,res)=>{
     return res.json('Hello world')
 })
 
-//test
+
 
 
 // routes
