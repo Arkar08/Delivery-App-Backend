@@ -8,11 +8,12 @@ export const getUser = async (req, res) => {
     const findUser = await Users.find({});
 
     const users = findUser.map((data) => {
-      const list = { ...data.toObject() };
+      const list = { ...data.toObject(),id:data._id };
       delete list.__v;
       delete list.createdAt;
       delete list.updatedAt;
       delete list.password;
+      delete list._id;
       return list;
     });
 

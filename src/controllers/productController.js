@@ -16,7 +16,8 @@ export const getProduct = async (req, res) => {
     const getProducts = findProduct.map((product) => {
       const categoryName = categoryMap[product.category] || "unknown";
 
-      const products = { ...product.toObject() };
+      const products = { ...product.toObject(),id:product._id };
+      delete products._id;
       delete products.__v;
 
       return {

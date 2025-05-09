@@ -18,10 +18,11 @@ export const getOrder = async (req, res) => {
       const customerName = customerMap[order.customer] || "Unknown";
       const deliveryMan = customerMap[order.deliveryMen] || "Unknown";
 
-      const orderList = { ...order.toObject() };
+      const orderList = { ...order.toObject(),id:order._id };
       delete orderList.__v;
       delete orderList.createdAt;
       delete orderList.updatedAt;
+      delete orderList._id;
 
       return {
         ...orderList,
