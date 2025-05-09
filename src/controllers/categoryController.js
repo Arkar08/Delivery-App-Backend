@@ -6,8 +6,9 @@ export const getCategory = async (req, res) => {
     const findData = await Category.find({});
 
     const category = findData.map((data) => {
-      const list = { ...data.toObject() };
+      const list = { ...data.toObject(),id:data._id };
       delete list.__v;
+      delete list._id;
       return list;
     });
 
