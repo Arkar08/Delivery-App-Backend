@@ -33,7 +33,7 @@ export const getUser = async (req, res) => {
 export const postUser = async (req, res) => {
   try {
     const { name, email, password, phone, role,address,longitude,latitude } = req.body;
-    if (!name || !email || !password || !phone || !role) {
+    if (!name || !email || !password || !role) {
       const data = {
         res: res,
         success: false,
@@ -52,11 +52,11 @@ export const postUser = async (req, res) => {
         name: name,
         email: email,
         password: hashPassword,
-        phone: phone,
+        phone: phone || null,
         role: role,
-        address: address,
-        longitude: longitude,
-        latitude: latitude,
+        address: address || null,
+        longitude: longitude || null,
+        latitude: latitude || null,
       });
 
       const token = await generateToken(res,newUser._id)

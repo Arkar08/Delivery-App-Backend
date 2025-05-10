@@ -6,7 +6,7 @@ const categorySchema = mongoose.Schema({
         type:String,
         require:true
     }
-},{timstamps:true})
+},{timestamps:true})
 
 const Category = mongoose.model('Category',categorySchema)
 
