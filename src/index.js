@@ -9,6 +9,7 @@ import ratingRoute from './routes/ratingRoute.js'
 import { errorMiddleware } from './middleware/errorMiddleware.js'
 import { authMiddleware } from './middleware/authMiddleware.js'
 import cors from 'cors';
+import multer from 'multer'
 
 dotenv.config();
 
@@ -22,7 +23,22 @@ app.get('/',(req,res)=>{
     return res.json('Hello world')
 })
 
+//upload
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({ storage})
+
+app.post('/api/v1/upload',upload.single("file"),(req,res)=>{
+    return res.send(req.file)
+})
 
 
 // routes
